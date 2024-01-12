@@ -1,0 +1,4 @@
+# Replace the following with your API credentials, and rename this file to `config.py`
+OPENAI_API_KEY = "YOUR_OPEN_AI_API_KEY_HERE"
+NEWSAPI_APP_ID = "YOUR_NEWSAPI_APP_ID_HERE"
+NEWSAPI_APP_KEY = "YOUR_NEWSAPI_APP_KEY_HERE"
