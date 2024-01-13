@@ -2,11 +2,11 @@ from copy import deepcopy
 import requests
 import json
 from datetime import datetime
-from config import NEWSAPI_APP_ID, NEWSAPI_APP_KEY
+import streamlit as st
 
 HEADERS = {
-    'X-AYLIEN-NewsAPI-Application-ID': NEWSAPI_APP_ID,
-    'X-AYLIEN-NewsAPI-Application-Key': NEWSAPI_APP_KEY
+    'X-AYLIEN-NewsAPI-Application-ID': st.secrets['NEWSAPI_APP_ID'],
+    'X-AYLIEN-NewsAPI-Application-Key': st.secrets['NEWSAPI_APP_KEY']
 }
 STORIES_ENDPOINT = 'https://api.aylien.com/news/stories'
 

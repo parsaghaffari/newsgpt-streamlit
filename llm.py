@@ -1,8 +1,8 @@
 import os
 import lmql
-
-from config import OPENAI_API_KEY 
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+import streamlit as st
+ 
+os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
 
 @lmql.query(model="openai/gpt-3.5-turbo-instruct")
 def generate_query(query):
