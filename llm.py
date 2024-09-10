@@ -1,20 +1,23 @@
 import os
-import lmql
 import streamlit as st
- 
+from openai import OpenAI
+import textwrap
+
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
 
-@lmql.query(model="openai/gpt-3.5-turbo-instruct")
-async def generate_query(query):
-    '''lmql
-    """Given a user's prompt for news articles about a specific area of interest like a company, a topic, or a person, generate a query with the right parameters from the user's prompt incorporated into it. 
+client = OpenAI(
+    api_key=os.environ["OPENAI_API_KEY"]
+)
+
+def generate_query(query):
+    prompt = f'''Given a user's prompt for news articles about a specific area of interest like a company, a topic, or a person, generate a query with the right parameters from the user's prompt incorporated into it. 
     If the user's query seems to be focused on a company or an individual, insert the name of that company or individual into the surface_forms.text attribute of the entity attribute to generate the query. If you know the Wikidata ID for that company or individual, add it with an OR operator to the entity query.
     If the user's query seems to be focused on a topic or concept, describe that topic or concept in up to 5 keywords or key phrases (each keyword or keyphrase must be wrapped in double quotes).
     If the user's query seems to be focused on an event like a car crash, a new product release, a terrorist attack, or an earthquake, write up to 5 keywords or short phrases that describe that event happening and put it in the title part of the text attribute to generate a query. 
     If an industry or business sector is mentioned in the query, include it in the query as a couple of keywords or keyphrases using an AND operator.
     On the second line of the query, insert the time range the user has specified in their prompt, in the format {{"published_at.start": "NOW-7DAYS", "published_at.end": "NOW"}} and replace the start and end values with values from the user's prompt.
-    When the query is about news published in a certain country, use the 'source.locations.country' attribute and insert the 2 letter country ID for that country. But when the news is requested about a country, add the country as an entity.
-
+    When the query is about news published in a certain country, use the 'source.locations.country' attribute and insert the 2 letter country ID for that country. But when the news is requested about a country, add the country as an entity. 
+    
     Examples:
 
     prompt: Show me all the articles about Aylien, an AI company based in Ireland, that were written in the last 24 hours
@@ -45,6 +48,11 @@ async def generate_query(query):
     prompt: What are the latest articles about politics?
     query:
     title:("Politics" OR "Politicians" OR "World politics")
+    {{"published_at.start": "NOW-7DAYS", "published_at.end": "NOW"}}
+    
+    prompt: What are the latest articles about Elon Musk that don't mention SpaceX?
+    query:
+    title:("Elon Musk" NOT "SpaceX")
     {{"published_at.start": "NOW-7DAYS", "published_at.end": "NOW"}}
 
     prompt: Show me all the articles about Steve Jobs
@@ -108,17 +116,34 @@ async def generate_query(query):
     {{"published_at.start": "NOW-4MONTHS", "published_at.end": "NOW-3MONTHS", "source.locations.country": [["SA"]]}}
 
     prompt: {query}
-    query: [AQL_QUERY]"""
-    return AQL_QUERY
-    '''
+    query:'''
     
-@lmql.query(model="openai/gpt-3.5-turbo-instruct")    
+    prompt = textwrap.dedent(prompt)
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="gpt-4-turbo",
+    )
+    return chat_completion.choices[0].message.content
+
 def summarise_news(headlines, num_sentences):
-    '''lmql
-    """Given the following list of news headlines, summarise them into a single paragraph with {num_sentences} sentences. 
+    prompt = f'''Given the following list of news headlines, summarise them into a single paragraph with {num_sentences} sentences. 
     Headlines: 
     {headlines} 
-    Summary: 
-    [SUMMARY]"""
-    return SUMMARY
-    '''
+    Summary:'''
+    
+    prompt = textwrap.dedent(prompt)
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="gpt-4-turbo",
+    )
+    return chat_completion.choices[0].message.content

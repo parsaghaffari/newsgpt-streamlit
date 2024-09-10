@@ -1,7 +1,6 @@
 import streamlit as st
 import json
 import timeago, datetime
-import asyncio
 from llm import *
 from newsapi import *
 
@@ -20,14 +19,10 @@ st.markdown("""Examples:
 - What's in the news about the president of China that has a negative sentiment?
 - What's the latest news about ESG in banking?""")
 
-async def search_news():
-    query = await generate_query(user_query)
-    return query
-
 if st.button("Search"):
-    query = asyncio.run(search_news())
-    aql = query.split("\n")[1]
-    params = json.loads(query.split("\n")[2])
+    query = generate_query(user_query)
+    aql = query.split("\n")[0]
+    params = json.loads(query.split("\n")[1])
     st.session_state['aql'] = aql
     st.session_state['params'] = params
     
