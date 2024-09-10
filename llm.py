@@ -5,7 +5,7 @@ import streamlit as st
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
 
 @lmql.query(model="openai/gpt-3.5-turbo-instruct")
-def generate_query(query):
+async def generate_query(query):
     '''lmql
     """Given a user's prompt for news articles about a specific area of interest like a company, a topic, or a person, generate a query with the right parameters from the user's prompt incorporated into it. 
     If the user's query seems to be focused on a company or an individual, insert the name of that company or individual into the surface_forms.text attribute of the entity attribute to generate the query. If you know the Wikidata ID for that company or individual, add it with an OR operator to the entity query.

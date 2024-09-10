@@ -1,3 +1,4 @@
 streamlit==1.29.0
 timeago==1.0.16
 lmql
+asyncio
